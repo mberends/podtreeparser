@@ -8,6 +8,7 @@ class Test::Harness {
         my Int $total_fail = 0;
         my Int $total_file = 0;
         my Int $time_started = int time;
+        my Bool $errors_seen = Bool::False;
         my Int $max_namechars = 1;
         for @filenames -> $name {
             if $name.chars > $max_namechars { $max_namechars = $name.chars; }
@@ -15,7 +16,11 @@ class Test::Harness {
         for @filenames -> Str $name {
             print "$name{'.'x($max_namechars+4-$name.chars)}";
             # run a single test as a child process and collect the output
-            my @results = fake_qx( "$perl $name" ).split("\n");
+            my $outfilename = '/tmp/Rakudo_Test_Harness.out';
+            my $errfilename = '/tmp/Rakudo_Test_Harness.err';
+            run( "$perl $name >$outfilename 2>$errfilename" );
+            my @results = slurp( $outfilename ).split("\n");
+            my @errors  = slurp( $errfilename ).split("\n").grep(/^.+$/);
             # the first line must announce the number of planned tests
             if @results[0] ~~ / <digit>+ <dot> <dot> ( <digit>+ ) / {
                 shift @results;
@@ -67,24 +72,25 @@ class Test::Harness {
                 $total_file++;
             }
             else { say "error - need plan : {@results[0]}"; }
+            if @errors {
+#               say @errors.join("\n");
+                $errors_seen = Bool::True;
+                for @errors { .say; }
+#               for @errors -> $error {
+#                   say "'$error'";
+#               }
+            }
         }
-        if $total_fail == 0 { say "All tests successful"; }
+        if $total_pass == 0 { say "No tests passed"; }
+        elsif $total_fail == 0 {
+            say $errors_seen ?? "Errors seen but all tests seemed to pass"
+                             !! "All tests successful";
+        }
         else { say "$total_fail failed, $total_pass passed"; }
         my Int $realtime = int time - $time_started;
         print "Files=$total_file, Tests=$total_test, ";
         say "$realtime wallclock secs r{%*VM<config><revision>}";
     }
-
-    # inefficient workaround - remove when Rakudo gets a qx operator
-    sub fake_qx( $command ) {
-        my Str $tempfile = "/tmp/rakudo_fake_qx.tmp";
-        my Str $fullcommand = "$command >$tempfile";
-        run $fullcommand;
-        my Str $result = slurp( $tempfile );
-        unlink $tempfile;
-        return $result;
-    }
-
 } # class Test::Harness
 
 =begin pod
@@ -103,7 +109,7 @@ Pass $perl parameter via %*ENV<HARNESS_PERL> to be compatible with the
 Perl 5 interface.
 
 =head1 BUGS
-Tested OK with Parrot/Rakudo revisions 36101-36107 (as at 2009-01-28).
+Tested OK with Parrot/Rakudo revisions 36101-37646 (as at 2009-03-23).
 
 =head1 SEE ALSO
 L<doc:prove>

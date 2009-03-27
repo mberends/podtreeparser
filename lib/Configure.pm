@@ -1,4 +1,4 @@
-# Configure.pm 
+# Configure.pm
 
 say "\nConfigure.pm is preparing to make your Makefile.\n";
 
@@ -12,8 +12,8 @@ say "\nConfigure.pm is preparing to make your Makefile.\n";
 my $parrot_dir = %*VM<config><build_dir>;
 my $rakudo_dir;
 my $perl6;
-# There are now just two possible relationships between the parrot and
-# rakudo directories: rakudo/parrot or parrot/languages/rakudo
+# There are two possible relationships between the parrot and rakudo
+# directories: rakudo/parrot or parrot/languages/rakudo
 if $parrot_dir ~~ / <parrot_in_rakudo> / {
     # first case, rakudo/parrot for example if installed using new
     # 'git clone ...rakudo.git' then 'perl Configure.pl --gen-parrot'
@@ -23,7 +23,7 @@ elsif "$parrot_dir/languages/rakudo" ~~ :d {
     # second case, parrot/languages/rakudo if installed the old way
     $rakudo_dir = "$parrot_dir/languages/rakudo";
 }
-else {
+else { # anything else 
     say "PARROT_DIR unexpected $parrot_dir";
     exit(1);
 }
@@ -75,15 +75,15 @@ sub squirt( Str $filename, Str $text ) {
 #    my/parrot/parrot my/rakudo/perl6.pbc Configure.p6
 # 2. The Rakudo "Fake Executable" made by pbc_to_exe:
 #    my/rakudo/perl6 Configure.p6
-# The rest are variations of 1. and 2. to shorten the command line:
-# 3. A shell script perl6 for 1. 'my/parrot/parrot my/rakudo/perl6.pbc $*':
+# The rest are variations of 1. and 2. to sugar the command line:
+# 3. A shell script perl6 for 1: 'my/parrot/parrot my/rakudo/perl6.pbc $*':
 #    my/perl6 Configure.p6    # or 'perl6 Configure.p6' with search path
-# 4. A shell alias for 1. perl6='my/parrot/parrot my/rakudo/perl6.pbc':
+# 4. A shell alias for 1: perl6='my/parrot/parrot my/rakudo/perl6.pbc':
 #    perl6 Configure.p6
-# 5. A symbolic link for 2. 'sudo ln -s /path/to/rakudo/perl6 /bin':
+# 5. A symbolic link for 2: 'sudo ln -s /path/to/rakudo/perl6 /bin':
 #    perl6 Configure.p6
 
-# Are there other ways to execute Perl 6 scripts? Please tell the author.
+# Are there other ways to execute Perl 6 scripts? Please tell the maintainers.
 
 regex parrot_in_rakudo { ( .* '/rakudo' ) '/parrot' }
 # regex rakudo_in_parrot { .* '/parrot/languages/rakudo' }
