@@ -1,20 +1,18 @@
 # Warning: Under Construction: nothing works or even makes sense!
 grammar Pod::Tree::Pod6 {
-    regex TOP       { ^ <directive> <content> <directive> $ }
-#   regex TOP       { ^ <beginpod> <content> <endpod> $ }
-#   regex TOP       { ^ <anyline> * $ {*}  }
-    regex anyline   { ^^ [ <directive> | <content> ] $$ }
-    regex directive { <beginpod> | <endpod> }
-    regex beginpod  { ^^ '=begin ' <typename> $$ \n {*} }
-    regex endpod    { ^^ '=end ' <typename> $$ \n {*} }
+    regex TOP       { ^ <ambient> [[<pod6>|<pod5>]<ambient>]* $ {*} }
+    regex ambient   { .*? <?before [ ^^ '=' | $ ] > {*} }
+    regex pod6      { ^^ '=begin pod' .*? ^^ '=end pod' {*} }
     regex typename  { pod | para | comment }
     regex content   { ^^ \N* $$ \n {*} }
+    regex pod5      { ^^ '=' <p5begin> .*? ^^ '=cut' {*} }
+    regex p5begin   { pod | head\d | over }
 #   # TODO: everything else
 }
 
-class Pod::Tree::Pod6::ambient { }
-class Pod::Tree::Pod6::directive { }
-class Pod::Tree::Pod6::content { }
+#class Pod::Tree::Pod6::ambient { }
+#class Pod::Tree::Pod6::directive { }
+#class Pod::Tree::Pod6::content { }
 
 =begin pod
 

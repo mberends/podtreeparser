@@ -1,17 +1,16 @@
-# Makefile.in for Pod::Tree::Pod6 and Pod::Tree::<emitter>
+# Makefile.in for Pod::Tree::Pod6 and Pod::Tree::<emitters>
 
 # Try it out:                    (without leading '# ', with your perl6)
 # cd /tmp; rm -rf podtreeparser     # or choose your alternative to /tmp
 # git clone git://github.com/mberends/podtreeparser.git
-# cd podtreeparser; perl6 Configure.p6
-# make test
+# cd podtreeparser && perl6 Configure.p6 && make test
 
 # Chat with the author and P6 developers in #perl6 on irc.freenode.net.
 
 # Bugs:
 # These Pod tools may give errors running with certain revisions of
 # Rakudo. Rakudo and the Pod tools are undergoing rapid development.
-# The most recent successfully tested Rakudo revision is Parrot r37407.
+# The most recent successfully tested Rakudo revision is Parrot r37794.
 
 # Configure.p6 replaces <TOKENS> when converting Makefile.in -> Makefile
 PERL6      = <PERL6>
@@ -53,6 +52,6 @@ help:
 	@echo 'all       - compiles .pm files to .pir for faster loading'
 	@echo 'test      - runs prove on the t/*.t scripts'
 	@echo 'clean     - removes .pir and editor backup files'
-	@echo 'realclean - clean and remove Makefile'
+	@echo 'realclean - clean, and remove Makefile'
 	@echo ''
 
