@@ -15,6 +15,7 @@
 # Configure.p6 replaces <TOKENS> when converting Makefile.in -> Makefile
 PERL6      = <PERL6>
 RAKUDO_DIR = <RAKUDO_DIR>
+# The variables PERL6LIB and PERL6BIN are not required in this Makefile.
 
 all: precompile
 
@@ -23,12 +24,12 @@ precompile: lib/Pod/Tree/Pod6.pir lib/Pod/Tree/Test.pir \
 
 # define how to precompile a module from its source code
 .SUFFIXES: .pm .pir
-.pm.pir: $(PERL6)
+.pm.pir: $(PERL6) Makefile
 	@echo 'precompile $< -> $@'
 	@export PERL6LIB=./lib; $(PERL6) --target=pir --output=$@ $<
 
 # avoid duplication - precompile the Test module from the Parrot source
-lib/Test.pir: $(RAKUDO_DIR)/Test.pm $(PERL6)
+lib/Test.pir: $(RAKUDO_DIR)/Test.pm $(PERL6) Makefile
 	@echo 'precompile $(RAKUDO_DIR)/Test.pm -> lib/Test.pir'
 	@$(PERL6) --target=pir --output=lib/Test.pir $(RAKUDO_DIR)/Test.pm
 

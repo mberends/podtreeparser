@@ -1,18 +1,27 @@
 # Warning: Under Construction: nothing works or even makes sense!
-grammar Pod::Tree::Pod6 {
+
+=begin pod
+grammar Pod::Tree::Pod6_old {
     regex TOP       { ^ <ambient> [[<pod6>|<pod5>]<ambient>]* $ {*} }
     regex ambient   { .*? <?before [ ^^ '=' | $ ] > {*} }
+#   regex ambient   { ^^ <-['=']>.*? <?before [ ^^ '=' | $ ] > {*} }
     regex pod6      { ^^ '=begin pod' .*? ^^ '=end pod' {*} }
-    regex typename  { pod | para | comment }
-    regex content   { ^^ \N* $$ \n {*} }
+#   regex typename  { pod | para | comment }
     regex pod5      { ^^ '=' <p5begin> .*? ^^ '=cut' {*} }
     regex p5begin   { pod | head\d | over }
-#   # TODO: everything else
+# TODO: everything else
+}
+=end pod
+
+grammar Pod::Tree::Pod6 {
+    regex TOP { ^ <section> * $ {*} }
+    regex section { [ <ambient> | <pod6> ] {*} }
+    regex ambient { ^^ ( <-[=]> .*? ) $$ \n? <?before [ ^^ '=' | $ ] > {*} }
+    regex pod6 { ^^ ( '=begin pod' .*? '=end pod' ) $$ \n? {*} }
+    regex pod5 { ^^ ( '=pod' .*? '=cut' ) $$ \n? {*} }
 }
 
-#class Pod::Tree::Pod6::ambient { }
-#class Pod::Tree::Pod6::directive { }
-#class Pod::Tree::Pod6::content { }
+#class Pod::Tree::Pod6::ambient { } # suggested in S26
 
 =begin pod
 
@@ -21,8 +30,7 @@ Pod::Tree::Pod6 - grammar for Perl 6 tree based Pod processors
 
 =head1 SYNOPSIS
 =begin code
-use Pod::Tree::Xhtml;
-say Pod::Tree::Xhtml.parse( slurp('example.pod') );
+use Pod::Tree::Xhtml; Pod::Tree::Xhtml.parse(slurp('example.pod')).say;
 =end code
 
 =head1 DESCRIPTION
@@ -30,8 +38,8 @@ Under construction. Nothing works yet. No finish date promised either.
 
 This is a tree based parser for Perl 6 Pod as specified in
 L<S26|http://perlcabal.org/syn/S26.html>. The draft status of S26 is
-fine, assuming that change can probably be incorporated in future
-revisions. After all, Pod will always be Pod.
+no problem, assuming maintenance can track revisions.
+After all, Pod must keep the spirit of Pod to merit the name.
 
 Learning lessons from the stream based L<Pod::Parser|http://github.com/eric256/perl6-examples/blob/master/lib/Pod/Parser.pm>,
 this implementation puts all the code into a grammar and an action class.

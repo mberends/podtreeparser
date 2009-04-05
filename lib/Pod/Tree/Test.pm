@@ -5,11 +5,11 @@ class Directive { has Str $!typename; }
 class Perldoc::Block::Ambient { }
 class Perldoc::Block { has $.version; }
 
-class Pod::Tree::Test {
+class Pod::Tree::Test_bak {
     has @!output;
 
     method TOP($/) {
-#       warn "TOP in";
+#       warn "TOP in " ~ $/.WHAT;
         my @keys = @( $/<anyline> );
         # warn "{+@keys} keys: {@keys.map({chomp $_})}";
 #       make gather for @( $/ ) -> $m {
@@ -17,18 +17,22 @@ class Pod::Tree::Test {
 #           elsif $m<content> { warn "CONTENT" }
 #           take $m.ast;
 #       }
-        make "TOP_MAKE";
-        warn "TOP ok";
+        make "doc beg test\n" ~
+             [~] gather for @( $/ ) -> $m {
+                 if defined $m.ast { take $m.ast };
+             } ~ "\n" ~
+             "doc end";
+        warn "TOP ok " ~ $/.WHAT;
     }
     method ambient($/) {
-#       warn "ambient in";
+        warn "ambient in " ~ $/;
 #       make [@( $/.ast ), Perldoc::Block::Ambient.new ];
-        make [ Perldoc::Block::Ambient.new ];
+        make "ambient";
+        warn "ambient ok " ~ $/.ast;
     }
     method pod6($/) {
 #       warn "pod6 in";
-        my $payload = [@( $/.ast )];
-        make $payload;
+        make "blk beg pod DELIMITED version=>6\n{1}\nblk end pod DELIMITED";
 #       warn "pod6 ok";
     }
     method content($/) {
@@ -55,6 +59,30 @@ class Pod::Tree::Test {
         )
     }
 }
+
+class Pod::Tree::Test {
+    method parse( Str $doc ) {
+        ~ Pod::Tree::Pod6.parse( $doc, :action( self.new ) );
+    }
+    method TOP($/) {
+        my @matches = gather for @( $/<section> ) -> $m {take $m.ast;}
+		make "doc beg test\n" ~ @matches ~ "\ndoc end";
+    }
+    method section($/) {
+        my Str $section = ~ $0;
+        if    defined($/<ambient>) { make "SA[{$/<ambient>}]" }
+        elsif defined($/<pod6>)    { make "{$/<pod6>}" }
+    }
+    method ambient($/) {
+        my Str $ambient = ~ $0;
+		make "ambient $ambient\n";
+    }
+    method pod6($/) {
+        my Str $pod6 = ~ $0;
+		make "blk beg pod DELIMITED\n$pod6\nblk end pod DELIMITED";
+    }
+}
+
 # http://irclog.perlgeek.de/perl6/2009-03-23#i_1008989
 # moritz_ but you can always make [@( $/.ast ), $new_value]
 # moritz_ that's basically the same as $/.ast.push($new_value), but it should atually work :-)
