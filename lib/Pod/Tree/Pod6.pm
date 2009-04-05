@@ -1,24 +1,13 @@
 # Warning: Under Construction: nothing works or even makes sense!
 
-=begin pod
-grammar Pod::Tree::Pod6_old {
-    regex TOP       { ^ <ambient> [[<pod6>|<pod5>]<ambient>]* $ {*} }
-    regex ambient   { .*? <?before [ ^^ '=' | $ ] > {*} }
-#   regex ambient   { ^^ <-['=']>.*? <?before [ ^^ '=' | $ ] > {*} }
-    regex pod6      { ^^ '=begin pod' .*? ^^ '=end pod' {*} }
-#   regex typename  { pod | para | comment }
-    regex pod5      { ^^ '=' <p5begin> .*? ^^ '=cut' {*} }
-    regex p5begin   { pod | head\d | over }
-# TODO: everything else
-}
-=end pod
-
 grammar Pod::Tree::Pod6 {
     regex TOP { ^ <section> * $ {*} }
     regex section { [ <ambient> | <pod6> ] {*} }
     regex ambient { ^^ ( <-[=]> .*? ) $$ \n? <?before [ ^^ '=' | $ ] > {*} }
-    regex pod6 { ^^ ( '=begin pod' .*? '=end pod' ) $$ \n? {*} }
+    regex pod6 { ^^   '=begin pod' ( .*? ) '=end pod' $$ \n? {*} }
+#   regex pod6 { ^^ ( '=begin pod' ( <content> ) '=end pod' ) $$ \n? {*} }
     regex pod5 { ^^ ( '=pod' .*? '=cut' ) $$ \n? {*} }
+    regex content { .*? \n? <?before [ ^^ '=' | $ ] > {*} }
 }
 
 #class Pod::Tree::Pod6::ambient { } # suggested in S26

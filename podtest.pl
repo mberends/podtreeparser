@@ -10,27 +10,41 @@ grammar Pod::Tree::Pod6 {
 }
 
 class Pod::Tree::Test {
+    method parse( Str $doc ) {
+        Pod::Tree::Pod6.parse( $doc, :action( self.new ) ).ast;
+    }
     method TOP($/) {
-        my @matches = gather for @( $/<section> ) -> $m {take $m.ast;}
-		make @matches;
+        my @matches = gather for @( $/<section> ) -> $m {
+            my $topsect = $m.ast;
+            take $topsect;
+        }
+        make @matches;
+        my $matches = [~] @matches;
+        make "doc beg\n$matches\ndoc end";
+        warn "top[$matches]";
     }
     method section($/) {
-        my Str $section = ~ $0;
-        if    defined($/<ambient>) { make "SA[{$/<ambient>}]" }
-        elsif defined($/<pod6>)    { make "SP6[{$/<pod6>}]" }
+        my Str $section = ~ $/.ast;
+        if defined($/<ambient>) {
+            my $ambient = $/<ambient>.ast;
+            make "SECAM[$ambient]";
+#           warn "secam[$ambient]";
+        }
+        elsif defined($/<pod6>) {
+            my $pod6 = $/<pod6>.ast;
+            make "SECP6[$pod6]";
+#           warn "secp6[$pod6]";
+        }
+        # warn "section[$section]";
     }
     method ambient($/) {
         my Str $ambient = ~ $0;
-		make "AM[$ambient]";
+        make "AM[$ambient]";
     }
     method pod6($/) {
         my Str $pod6 = ~ $0;
-		make "P6[$pod6]";
-    }
-    method parse( Str $doc ) {
-        return ~ Pod::Tree::Pod6.parse(
-            $doc, :action( Pod::Tree::Test.new )
-        )
+        make "P6[$pod6]";
+#       warn "pod6[$pod6]";
     }
 }
 
