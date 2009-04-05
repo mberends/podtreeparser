@@ -2,4 +2,4 @@ This is ambient text, outside Pod.
 =begin pod
 document 01 plain text
 =end pod
-This is also ambient text;
+This is also ambient text.

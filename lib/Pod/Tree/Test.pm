@@ -6,6 +6,9 @@ class Pod::Tree::Test {
     method parse( Str $doc ) {
         Pod::Tree::Pod6.parse( $doc, :action( self.new ) ).ast;
     }
+    method parsefile( Str $name ) {
+        Pod::Tree::Pod6.parsefile( $name, :action( self.new ) ).ast;
+    }
     method TOP($/) {
         my @matches = gather for @( $/<section> ) -> $m {take $m.ast;}
         make "doc beg test\n" ~ @matches ~ "\ndoc end";

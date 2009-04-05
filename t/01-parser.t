@@ -3,12 +3,11 @@ use Test::Differences;
 use Pod::Tree::Test;
 #use Pod::Tree::Pod6;
 
-plan 1;
+plan 2;
 
 my ( Str $received, Str $expected );
 
-#$received = Pod::Tree::Test.parse("b 1\nb 2\nb 3\n=begin pod\nwords\n=end pod\na 1\na 2\na 3");
-$received = Pod::Tree::Test.parse( slurp('t/p01-plain.pod') );
+$received = Pod::Tree::Test.parsefile('t/p01-plain.pod');
 $expected = "doc beg test
 blk beg pod DELIMITED version=>6
 blk beg para PARAGRAPH
@@ -18,9 +17,13 @@ blk end pod DELIMITED
 doc end";
 eq_or_diff( $received, $expected, 'p01-plain.pod simplest text' );
 
-#$received = Pod::Tree::Test.parse( slurp('t/p01-ambient.pod') );
-$expected = "doc beg test\ndoc end";
-#eq_or_diff( $received, $expected, 'p01-ambient.pod' );
+$received = Pod::Tree::Test.parsefile('t/p01-ambient.pod');
+$expected = "doc beg test
+ambient This is ambient text, outside Pod.
+
+ambient This is also ambient text;
+doc end";
+eq_or_diff( $received, $expected, 'p01-ambient.pod' );
 
 #$received = Pod::Tree::Test.parse( slurp('t/p02-para.pod') );
 $expected = "doc beg test\ndoc end";
