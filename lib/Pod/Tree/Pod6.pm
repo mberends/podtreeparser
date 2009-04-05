@@ -2,12 +2,11 @@
 
 grammar Pod::Tree::Pod6 {
     regex TOP { ^ <section> * $ {*} }
-    regex section { [ <ambient> | <pod6> ] {*} }
+    regex section { [ <ambient> | <pod6> | <pod5> ] {*} }
     regex ambient { ^^ ( <-[=]> .*? ) $$ \n? <?before [ ^^ '=' | $ ] > {*} }
-    regex pod6 { ^^   '=begin pod' ( .*? ) '=end pod' $$ \n? {*} }
-#   regex pod6 { ^^ ( '=begin pod' ( <content> ) '=end pod' ) $$ \n? {*} }
-    regex pod5 { ^^ ( '=pod' .*? '=cut' ) $$ \n? {*} }
-    regex content { .*? \n? <?before [ ^^ '=' | $ ] > {*} }
+    regex pod6 { ^^ '=begin pod' \n <content> \n '=end pod' $$ \n? {*} }
+    regex pod5 { ^^ '=pod' ( .*? ) '=cut' $$ \n? {*} }
+    regex content { .*?     <?before [ \n? ^^ '=' | $ ] > {*} }
 }
 
 #class Pod::Tree::Pod6::ambient { } # suggested in S26

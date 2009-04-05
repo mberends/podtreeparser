@@ -1,3 +1,5 @@
+# Pod/Tree/Test.pm  diagnotic emitter for Perl 6 tree based Pod parser
+
 use Pod::Tree::Pod6;       # the Perl 6 Pod grammar
 
 class Pod::Tree::Test {
@@ -26,14 +28,16 @@ class Pod::Tree::Test {
 		make "ambient $ambient\n";
     }
     method pod6($/) {
-        my Str $p6 = ~ $0;
-        make "blk beg pod DELIMITED version=>6\n$p6\nblk end pod DELIMITED";
+        my Str $p6 = ~ $/<content>.ast;
+        make "blk beg pod DELIMITED version=>6\n$p6\n"
+           ~ "blk end pod DELIMITED";
 #       warn "pod6[$p6]";
     }
     method content($/) {
         my Str $content = ~ $/;
-        make "CONT[$content]";
-#       warn "cont[$content]";
+        make "blk beg para PARAGRAPH\ncontent $content\n"
+           ~ "blk end para PARAGRAPH";
+#       warn "content[$content]";
     }
 }
 
@@ -46,13 +50,13 @@ class Pod::Tree::Test {
 =begin pod
 
 =head1 NAME
-Pod::Tree::Test - class to trace parsing of Pod
+Pod::Tree::Test - diagnotic trace emitter for Perl 6 tree based Pod parser
 
 =head1 SYNOPSIS
 =begin code
 # in shell
 perl6 -e'use Pod::Tree::Test; \
-say Pod::Tree::Test.new.parse("=begin pod\nHello, pod!\n=end pod");'
+Pod::Tree::Test.parse("=begin pod\nHello, pod!\n=end pod").say;'
 =end code
 
 =end pod
