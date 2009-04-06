@@ -1,8 +1,8 @@
-# Pod/Tree/Test.pm  diagnotic emitter for Perl 6 tree based Pod parser
+# Pod/Tree/Text.pm  plain text emitter for Perl 6 tree based Pod parser
 
 use Pod::Tree::Pod6;       # the Perl 6 Pod grammar
 
-class Pod::Tree::Test {
+class Pod::Tree::Text {
     has Str $!title = 'test';
     multi method parse( Str $doc ) {
         Pod::Tree::Pod6.parse( $doc, :action( self.new ) ).ast;
@@ -20,7 +20,7 @@ class Pod::Tree::Test {
     }
     method TOP($/) {
         my $matches = [~] map( { $_.ast }, @( $/<section> ) );
-        make "doc beg $!title\n" ~ $matches ~ "doc end";
+        make $matches;
     }
     method section($/) {
         my Str $section = ~ $0;
@@ -35,8 +35,7 @@ class Pod::Tree::Test {
     }
     method pod6($/) {
         my Str $p6 = ~ $/<content>.ast;
-        make "blk beg pod DELIMITED version=>6\n$p6"
-           ~ "blk end pod DELIMITED\n";
+        make $p6;
     }
     method pod5($/) {
         my Str $p5 = ~ $/<content>.ast;
@@ -45,8 +44,7 @@ class Pod::Tree::Test {
     }
     method content($/) {
         my Str $content = ~ $/;
-        make "blk beg para PARAGRAPH\ncontent $content\n"
-           ~ "blk end para PARAGRAPH\n";
+        make "    $content";
     }
 }
 

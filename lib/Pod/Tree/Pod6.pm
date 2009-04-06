@@ -1,11 +1,12 @@
-# Warning: Under Construction: nothing works or even makes sense!
+# Pod/Tree/Pod6.pm  main grammar for Perl 6 tree based Pod parser
 
 grammar Pod::Tree::Pod6 {
-    regex TOP { ^ <section> * $ {*} }
+    regex TOP     { ^ <section> * $ {*} }
     regex section { [ <ambient> | <pod6> | <pod5> ] {*} }
     regex ambient { ^^ ( <-[=]> .*? ) $$ \n? <?before [ ^^ '=' | $ ] > {*} }
-    regex pod6 { ^^ '=begin pod' \n <content> \n '=end pod' $$ \n? {*} }
-    regex pod5 { ^^ '=pod' ( .*? ) '=cut' $$ \n? {*} }
+    regex pod6    { ^^ '=begin pod' \n <content> \n '=end pod' $$ \n? {*} }
+    regex p6block { .*? } # to be defined
+    regex pod5    { ^^ '=pod' ( .*? ) '=cut' $$ \n? {*} }
     regex content { .*?     <?before [ \n? ^^ '=' | $ ] > {*} }
 }
 
@@ -18,7 +19,7 @@ Pod::Tree::Pod6 - grammar for Perl 6 tree based Pod processors
 
 =head1 SYNOPSIS
 =begin code
-use Pod::Tree::Xhtml; Pod::Tree::Xhtml.parse(slurp('example.pod')).say;
+use Pod::Tree::Xhtml; Pod::Tree::Xhtml.parsefile('example.pod').say;
 =end code
 
 =head1 DESCRIPTION
@@ -73,7 +74,7 @@ causes huge memory and CPU loads. Some approximate Pod::Server responses:
 Results on a dual core amd64 4200+, 2GB memory, running Linux. Only one
 CPU core runs each process :(
 
-Seeing memory use up to 15000 times document size is worrying.
+Seeing memory use up to 15KB per document character is worrying.
 The developer guidelines that apply to Java and .NET probably apply to
 Rakudo as well - keep the application code small and shift as much of
 the heavy processing burden as possible to the standard libraries of the
@@ -84,12 +85,12 @@ Carl Mäsak++ wrote "all the grunt work, is made by the Pod6 grammar".
 That observation and the excellent code Matthew Walton has written in
 L<Form.pm|http://github.com/mattw/form/tree/master> inspired this tree
 parser. Through actions, the grammar will not only pattern match the Pod
-syntax but also dispatch to the handler, in most cases an emitter.
+syntax but also dispatch to the handler, in most cases an output formatter.
 If it works, comparing stream versus tree parsing performance will be
 interesting.
 In the spirit of "prepare to throw one away", let the best solution win.
 
-Stream processing redefines many small strings in frequent loops,
+Stream processing redefines many small strings in frequent loops, thus
 requesting many heap allocations.
 Tree processing handles an entire document in a single call with
 grammar, regexes and action classes. It might be faster and more compact
@@ -105,15 +106,31 @@ the specification. Before the arrival of suitable automated tools,
 coverage of the code and the specification must be assessed manually.
 
 =head2 Test Coverage
+There are at least 8 test documents (.pod files in the t/ directory)
+and 6 standard emitters (Test, Text, Man, Xhtml, Pod5, Pod6), resulting
+in 48 potential tests. Currently 1 test (2%) passes.
+
+The test document suite must be carefully enlarged and accurately
+referenced to S26. One day a tool may be able to show how well a test
+suite covers a specification, but the current Perl 5 Pod format of the
+specifications is a disadvantage, hopefully soon to be upgraded by this!
 
 =head3 Specification Implemented
+Directives: C<=begin pod> C<end pod>
+Formatting codes: none yet
 
 =head3 Specification To Do
+Directives: C<=for> C<=head1> etc
+Formatting codes: B C D etc
 
 =head3 Code Tested
+Parser: regex: ambient pod6
+Emitter: Test
 
 =head3 Code Untested
-(covering these is always top priority)
+(covering these is a high priority)
+Parser: regex: pod5
+Emitters: Text Man Xhtml Pod5 Pod6
 
 =head1 AUTHOR
 Martin Berends (mberends on CPAN github #perl6 and @autoexec.demon.nl).
