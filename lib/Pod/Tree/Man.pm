@@ -1,31 +1,8 @@
 # Pod/Tree/Man.pm  man page emitter for Perl 6 tree based Pod parser
 
-use Pod::Tree::Pod6;       # the Perl 6 Pod grammar
+use Pod::Tree::Parser;       # Perldoc grammar and Parser role
 
-class Pod::Tree::Man {
-    has Str $!title = 'test';
-    multi method parse( Str $doc ) {
-        Pod::Tree::Pod6.parse( $doc, :action( self.new ) ).ast;
-    }
-    multi method parse( Str $doc, Str $doctitle ) {
-        $!title = $doctitle;
-        Pod::Tree::Pod6.parse( $doc, :action( self.new ) ).ast;
-    }
-    multi method parsefile( Str $name ) {
-        Pod::Tree::Pod6.parsefile( $name, :action(self.new) ).ast;
-    }
-    multi method parsefile( Str $name, Str $doctitle ) {
-        $!title = $doctitle;
-        Pod::Tree::Pod6.parsefile( $name, :action(self.new) ).ast;
-    }
-    sub docdate( Num $seconds ) {
-        # Bogus year-month-day calculation.
-        # Needs an accurate localtime() function to replace this kludge.
-        my $day   = floor( $seconds / 3600 / 24 );
-        my $year  = floor( $day / 365.24 ); $day -= floor( $year * 365.24 );
-        my $month = floor( $day / 30.5 );   $day -= floor( $month * 30.5 );
-        return sprintf( "%4d-%02d-%02d", $year+1970, $month+1, $day+1 );
-    }
+class Pod::Tree::Man does Pod::Tree::Parser {
     method TOP($/) {
         my $docdate = docdate( time() );
         my $matches = [~] map( { $_.ast }, @( $/<section> ) );
@@ -55,6 +32,14 @@ class Pod::Tree::Man {
     method content($/) {
         my Str $content = ~ $/;
         make ".PP\n$content\n";
+    }
+    sub docdate( Num $seconds ) {
+        # Bogus year-month-day calculation.
+        # Needs an accurate localtime() function to replace this kludge.
+        my $day   = floor( $seconds / 3600 / 24 );
+        my $year  = floor( $day / 365.24 ); $day -= floor( $year * 365.24 );
+        my $month = floor( $day / 30.5 );   $day -= floor( $month * 30.5 );
+        return sprintf( "%4d-%02d-%02d", $year+1970, $month+1, $day+1 );
     }
 }
 

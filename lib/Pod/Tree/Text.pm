@@ -1,23 +1,8 @@
 # Pod/Tree/Text.pm  plain text emitter for Perl 6 tree based Pod parser
 
-use Pod::Tree::Pod6;       # the Perl 6 Pod grammar
+use Pod::Tree::Parser;       # Perldoc grammar and Parser role
 
-class Pod::Tree::Text {
-    has Str $!title = 'test';
-    multi method parse( Str $doc ) {
-        Pod::Tree::Pod6.parse( $doc, :action( self.new ) ).ast;
-    }
-    multi method parse( Str $doc, Str $doctitle ) {
-        $!title = $doctitle;
-        Pod::Tree::Pod6.parse( $doc, :action( self.new ) ).ast;
-    }
-    multi method parsefile( Str $name ) {
-        Pod::Tree::Pod6.parsefile( $name, :action(self.new) ).ast;
-    }
-    multi method parsefile( Str $name, Str $doctitle ) {
-        $!title = $doctitle;
-        Pod::Tree::Pod6.parsefile( $name, :action(self.new) ).ast;
-    }
+class Pod::Tree::Text does Pod::Tree::Parser {
     method TOP($/) {
         my $matches = [~] map( { $_.ast }, @( $/<section> ) );
         make $matches;

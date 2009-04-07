@@ -2,10 +2,10 @@
 
 use Pod::Tree::Parser;       # Perldoc grammar and Parser role
 
-class Pod::Tree::Test does Pod::Tree::Parser {
+class Pod::Tree::Pod5 does Pod::Tree::Parser {
     method TOP($/) {
         my $matches = [~] map( { $_.ast }, @( $/<section> ) );
-        make "doc beg $!title\n" ~ $matches ~ "doc end";
+        make $matches;
     }
     method section($/) {
         my Str $section = ~ $0;
@@ -20,8 +20,7 @@ class Pod::Tree::Test does Pod::Tree::Parser {
     }
     method pod6($/) {
         my Str $p6 = ~ $/<content>.ast;
-        make "blk beg pod DELIMITED version=>6\n$p6"
-           ~ "blk end pod DELIMITED\n";
+        make "=pod\n$p6=cut";
     }
     method pod5($/) {
         my Str $p5 = ~ $/<content>.ast;
@@ -30,21 +29,20 @@ class Pod::Tree::Test does Pod::Tree::Parser {
     }
     method content($/) {
         my Str $content = ~ $/;
-        make "blk beg para PARAGRAPH\ncontent $content\n"
-           ~ "blk end para PARAGRAPH\n";
+        make "\n$content\n\n";
     }
 }
 
 =begin pod
 
 =head1 NAME
-Pod::Tree::Test - diagnotic trace emitter for Perl 6 tree based Pod parser
+Pod::Tree::Pod5 - Perl 5 Pod emitter for Perl 6 tree based Pod parser
 
 =head1 SYNOPSIS
 =begin code
 # in shell
-perl6 -e'use Pod::Tree::Test; \
-Pod::Tree::Test.parse("=begin pod\nHello, pod!\n=end pod").say;'
+perl6 -e'use Pod::Tree::Pod5; \
+Pod::Tree::Pod5.parse("=begin pod\nHello, pod!\n=end pod").say;'
 =end code
 
 =end pod

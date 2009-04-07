@@ -19,8 +19,9 @@ RAKUDO_DIR = <RAKUDO_DIR>
 
 all: precompile
 
-precompile: lib/Pod/Tree/Pod6.pir lib/Pod/Tree/Test.pir \
- lib/Pod/Tree/Text.pir lib/Pod/Tree/Man.pir \
+precompile: lib/Pod/Tree/Parser.pir lib/Pod/Tree/Test.pir \
+ lib/Pod/Tree/Text.pir lib/Pod/Tree/Man.pir lib/Pod/Tree/Xhtml.pir \
+ lib/Pod/Tree/Pod5.pir lib/Pod/Tree/Pod6.pir \
  lib/Test.pir lib/Test/Harness.pir lib/Test/Differences.pir
 
 # define how to precompile a module from its source code

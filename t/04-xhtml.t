@@ -1,17 +1,13 @@
 #!/usr/local/bin/perl6
 use Test::Differences;
-use Pod::to::xhtml;
-use Test::Mock::Parser;
+use Pod::Tree::Xhtml;
 
-class Test::Parser is Pod::to::xhtml does Test::Mock::Parser {}
+plan 1;
 
-plan 8;
+my ( Str $received, Str $expected );
 
-my Test::Parser $p .= new; $p.parse_file('/dev/null'); # warming up,
-# initializes Parser state even though testing parses strings not files.
-
-my $pod = slurp('t/p01-plain.pod').chomp; # Rakudo slurp appends a "\n"
-my $expected = q[<?xml version="1.0" ?>
+$received = Pod::Tree::Xhtml.parsefile('t/p01-plain.pod');
+$expected = q[<?xml version="1.0" ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head><title>test</title>
@@ -28,10 +24,9 @@ pre { font-size: 10pt; background-color: lightgray; border-style: solid;
     <p>document 01 plain text</p>
 </body>
 </html>];
-my $output = $p.parse( $pod ).join("\n");
-eq_or_diff( $output, $expected, "p01-plain.pod simplest text" );
+eq_or_diff( $received, $expected, "p01-plain.pod simplest text" );
 
-$pod = slurp('t/p02-para.pod').chomp; # Rakudo slurp appends a "\n"
+#$pod = slurp('t/p02-para.pod').chomp; # Rakudo slurp appends a "\n"
 $expected = q[<?xml version="1.0" ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -57,10 +52,10 @@ pre { font-size: 10pt; background-color: lightgray; border-style: solid;
     <p>The fourth paragraph is declared in the delimited style.</p>
 </body>
 </html>];
-$output = $p.parse( $pod ).join("\n");
-eq_or_diff( $output, $expected, 'p02-para.pod paragraphs' );
+#$output = $p.parse( $pod ).join("\n");
+#eq_or_diff( $output, $expected, 'p02-para.pod paragraphs' );
 
-$pod = slurp('t/p03-head.pod').chomp; # Rakudo slurp appends a "\n"
+#$pod = slurp('t/p03-head.pod').chomp; # Rakudo slurp appends a "\n"
 $expected = q[<?xml version="1.0" ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -87,10 +82,10 @@ pre { font-size: 10pt; background-color: lightgray; border-style: solid;
     http://perlcabal.org/syn/S26.html</p>
 </body>
 </html>];
-$output = $p.parse( $pod ).join("\n");
-eq_or_diff( $output, $expected, 'p03-head.pod =head1 and =head2' );
+#$output = $p.parse( $pod ).join("\n");
+#eq_or_diff( $output, $expected, 'p03-head.pod =head1 and =head2' );
 
-$pod = slurp('t/p04-code.pod').chomp; # Rakudo slurp appends a "\n"
+#$pod = slurp('t/p04-code.pod').chomp; # Rakudo slurp appends a "\n"
 $expected = q[<?xml version="1.0" ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -124,10 +119,10 @@ say 'second';
     </pre>
 </body>
 </html>];
-$output = $p.parse( $pod ).join("\n");
-eq_or_diff( $output, $expected, 'p04-code.pod code paragraphs' );
+#$output = $p.parse( $pod ).join("\n");
+#eq_or_diff( $output, $expected, 'p04-code.pod code paragraphs' );
 
-$pod = slurp('t/p05-pod5.pod').chomp; # Rakudo slurp appends a "\n"
+#$pod = slurp('t/p05-pod5.pod').chomp; # Rakudo slurp appends a "\n"
 $expected = q[<?xml version="1.0" ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -155,10 +150,10 @@ pre { font-size: 10pt; background-color: lightgray; border-style: solid;
     </p>
 </body>
 </html>];
-$output = $p.parse( $pod ).join("\n");
-eq_or_diff( $output, $expected, 'p05-pod5.pod legacy compatibility' );
+#$output = $p.parse( $pod ).join("\n");
+#eq_or_diff( $output, $expected, 'p05-pod5.pod legacy compatibility' );
 
-$pod = slurp('t/p07-basis.pod').chomp; # Rakudo slurp appends a "\n"
+#$pod = slurp('t/p07-basis.pod').chomp; # Rakudo slurp appends a "\n"
 $expected = q[<?xml version="1.0" ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -190,10 +185,10 @@ pre { font-size: 10pt; background-color: lightgray; border-style: solid;
     wrapped in whatever output format it is rendered</strong>.</p>
 </body>
 </html>];
-$output = $p.parse( $pod ).join("\n");
-eq_or_diff( $output, $expected, "p07-basis.pod format B<basis>" );
+#$output = $p.parse( $pod ).join("\n");
+#eq_or_diff( $output, $expected, "p07-basis.pod format B<basis>" );
 
-$pod = slurp('t/p08-code.pod').chomp; # Rakudo slurp appends a "\n"
+#$pod = slurp('t/p08-code.pod').chomp; # Rakudo slurp appends a "\n"
 $expected = q[<?xml version="1.0" ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -226,10 +221,10 @@ pre { font-size: 10pt; background-color: lightgray; border-style: solid;
     <p>Multiple angles <code> $a = ( $b &gt; $c );</code> also delimit.</p>
 </body>
 </html>];
-$output = $p.parse( $pod ).join("\n");
-eq_or_diff( $output, $expected, "p08-code.pod format C<code>" );
+#$output = $p.parse( $pod ).join("\n");
+#eq_or_diff( $output, $expected, "p08-code.pod format C<code>" );
 
-$pod = slurp('t/p13-link.pod').chomp; # Rakudo slurp appends a "\n"
+#$pod = slurp('t/p13-link.pod').chomp; # Rakudo slurp appends a "\n"
 $expected = q[<?xml version="1.0" ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -300,6 +295,6 @@ pre { font-size: 10pt; background-color: lightgray; border-style: solid;
     <p>The Perl Journal ( 1087-903X).</p>
 </body>
 </html>];
-$output = $p.parse( $pod ).join("\n");
-eq_or_diff( $output, $expected, 'p13-link.pod format L<link>' );
+#$output = $p.parse( $pod ).join("\n");
+#eq_or_diff( $output, $expected, 'p13-link.pod format L<link>' );
 
