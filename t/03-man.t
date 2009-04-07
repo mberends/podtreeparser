@@ -1,27 +1,22 @@
 #!/usr/local/bin/perl6
 use Test::Differences;
-use Pod::to::man;
-use Test::Mock::Parser;
+use Pod::Tree::Man;
 
-class Test::Parser is Pod::to::man does Test::Mock::Parser {}
+plan 1;
 
-plan 8;
+my ( Str $received, Str $expected );
+my $docdate = Pod::Tree::Man::docdate( time() ); # TODO: replace with mtime when stat() works
 
-my Test::Parser $p .= new; $p.parse_file('/dev/null'); # warming up,
-# initializes Parser state even though testing parses strings not files.
-
-my $docdate = Pod::to::man::docdate( time() ); # TODO: replace with mtime when stat() works
-my $pod = slurp('t/p01-plain.pod').chomp; # Rakudo slurp appends a "\n"
-my $expected = qq[.TH test 6 "$docdate" "Perl 6" "Plain Old Documentation"] ~ q[
+$received = Pod::Tree::Man.parsefile('t/p01-plain.pod');
+$expected = qq[.TH test 6 "$docdate" "Perl 6" "Plain Old Documentation"] ~ q[
 .nh
 .ad l
 .PP
 document 01 plain text
 .\\" test end.];
-my $output = $p.parse( $pod ).join("\n");
-eq_or_diff( $output, $expected, "p01-plain.pod simplest text" );
+eq_or_diff( $received, $expected, 'p01-plain.pod simplest text' );
 
-$pod = slurp('t/p02-para.pod').chomp; # Rakudo slurp appends a "\n"
+#$received = Pod::Tree::Man.parsefile('t/p01-ambient.pod');
 $expected = qq[.TH test 6 "$docdate" "Perl 6" "Plain Old Documentation"] ~ q[
 .nh
 .ad l
@@ -36,10 +31,26 @@ The third paragraph is declared in the abbreviated style.
 .PP
 The fourth paragraph is declared in the delimited style.
 .\" test end.];
-$output = $p.parse( $pod ).join("\n");
-eq_or_diff( $output, $expected, 'p02-para.pod paragraphs' );
+#eq_or_diff( $output, $expected, 'p01-ambient.pod' );
 
-$pod = slurp('t/p03-head.pod').chomp; # Rakudo slurp appends a "\n"
+#$received = Pod::Tree::Man.parsefile('t/p02-para.pod');
+$expected = qq[.TH test 6 "$docdate" "Perl 6" "Plain Old Documentation"] ~ q[
+.nh
+.ad l
+.PP
+Document p02-para.pod tests paragraphs.
+.PP
+After the above one liner, this second paragraph has three lines to verify
+that all lines are processed together as one paragraph, and to check word
+wrap.
+.PP
+The third paragraph is declared in the abbreviated style.
+.PP
+The fourth paragraph is declared in the delimited style.
+.\" test end.];
+#eq_or_diff( $output, $expected, 'p02-para.pod paragraphs' );
+
+#$pod = slurp('t/p03-head.pod').chomp; # Rakudo slurp appends a "\n"
 $expected = qq[.TH test 6 "$docdate" "Perl 6" "Plain Old Documentation"] ~ q[
 .nh
 .ad l
@@ -52,10 +63,10 @@ Pod::Parser - stream based parser for Perl 6 Plain Old Documentation
 The specification for Perl 6 POD is Synopsis 26, which can be found at
 http://perlcabal.org/syn/S26.html
 .\" test end.];
-$output = $p.parse( $pod ).join("\n");
-eq_or_diff( $output, $expected, 'p03-head.pod =head1 and =head2' );
+#$output = $p.parse( $pod ).join("\n");
+#eq_or_diff( $output, $expected, 'p03-head.pod =head1 and =head2' );
 
-$pod = slurp('t/p04-code.pod').chomp; # Rakudo slurp appends a "\n"
+#$pod = slurp('t/p04-code.pod').chomp; # Rakudo slurp appends a "\n"
 $expected = qq[.TH test 6 "$docdate" "Perl 6" "Plain Old Documentation"] ~ q[
 .nh
 .ad l
@@ -76,10 +87,10 @@ This text is a non code paragraph.
 say 'second';
 .fi
 .\" test end.];
-$output = $p.parse( $pod ).join("\n");
-eq_or_diff( $output, $expected, 'p04-code.pod code paragraphs' );
+#$output = $p.parse( $pod ).join("\n");
+#eq_or_diff( $output, $expected, 'p04-code.pod code paragraphs' );
 
-$pod = slurp('t/p05-pod5.pod').chomp; # Rakudo slurp appends a "\n"
+#$pod = slurp('t/p05-pod5.pod').chomp; # Rakudo slurp appends a "\n"
 $expected = qq[.TH test 6 "$docdate" "Perl 6" "Plain Old Documentation"] ~ q[
 .nh
 .ad l
@@ -92,10 +103,10 @@ p05-pod5.pod - Perl 5 Plain Old Document to test backward compatibility
 .PP
 This document starts with a marker that indicates POD 5 and not POD 6.
 .\" test end.];
-$output = $p.parse( $pod ).join("\n");
-eq_or_diff( $output, $expected, 'p05-pod5.pod legacy compatibility' );
+#$output = $p.parse( $pod ).join("\n");
+#eq_or_diff( $output, $expected, 'p05-pod5.pod legacy compatibility' );
 
-$pod = slurp('t/p07-basis.pod').chomp; # Rakudo slurp appends a "\n"
+#$pod = slurp('t/p07-basis.pod').chomp; # Rakudo slurp appends a "\n"
 $expected = qq[.TH test 6 "$docdate" "Perl 6" "Plain Old Documentation"] ~ q[
 .nh
 .ad l
@@ -115,10 +126,10 @@ Third, \fBa basis phrase\fR followed by \fBanother basis phrase\fR.
 Fourth, \fBa basis phrase that is so long that it should be word wrapped in
 whatever output format it is rendered\fR.
 .\" test end.];
-$output = $p.parse( $pod ).join("\n");
-eq_or_diff( $output, $expected, "p07-basis.pod format B<basis>" );
+#$output = $p.parse( $pod ).join("\n");
+#eq_or_diff( $output, $expected, "p07-basis.pod format B<basis>" );
 
-$pod = slurp('t/p08-code.pod').chomp; # Rakudo slurp appends a "\n"
+#$pod = slurp('t/p08-code.pod').chomp; # Rakudo slurp appends a "\n"
 $expected = qq[.TH test 6 "$docdate" "Perl 6" "Plain Old Documentation"] ~ q[
 .nh
 .ad l
@@ -138,10 +149,10 @@ characters.
 .PP
 Multiple angles \f(CW" $a = ( $b > $c );"\fR also delimit.
 .\" test end.];
-$output = $p.parse( $pod ).join("\n");
-eq_or_diff( $output, $expected, "p08-code.pod format C<code>" );
+#$output = $p.parse( $pod ).join("\n");
+#eq_or_diff( $output, $expected, "p08-code.pod format C<code>" );
 
-$pod = slurp('t/p13-link.pod').chomp; # Rakudo slurp appends a "\n"
+#$pod = slurp('t/p13-link.pod').chomp; # Rakudo slurp appends a "\n"
 $expected = qq[.TH test 6 "$docdate" "Perl 6" "Plain Old Documentation"] ~ q[
 .nh
 .ad l
@@ -184,6 +195,6 @@ To treat his chronic \fIlexiphania\fR the doctor prescribed
 .PP
 The Perl Journal (\fI1087-903X\fR).
 .\" test end.];
-$output = $p.parse( $pod ).join("\n");
-eq_or_diff( $output, $expected, "p13-link.pod format L<link>" );
+#$output = $p.parse( $pod ).join("\n");
+#eq_or_diff( $output, $expected, "p13-link.pod format L<link>" );
 
