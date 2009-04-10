@@ -1,2 +1,14 @@
+#!perl6
+say "any Perl 6 code";
+
 =for pod
-Example of paragraph style, ended by blank line or end of file.
+Paragraph style first,
+ended by Pod directive.
+=for pod
+Paragraph style second,
+ended by blank line.
+
+say "more Perl 6";
+=for pod
+Paragraph style third,
+ended by end of file.

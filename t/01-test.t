@@ -17,13 +17,29 @@ doc end";
 eq_or_diff( $received, $expected, 'p01-delim.pod delimited style' );
 
 $received = Pod::Tree::Test.parsefile('t/p01-para.pod');
-$expected = "doc beg test
+$expected = 'doc beg test
+ambient #!perl6
+ambient say "any Perl 6 code";
 blk beg pod PARAGRAPH version=>6
 blk beg para PARAGRAPH
-content Example of paragraph style, ended by blank line or end of file.
+content Paragraph style first,
+content ended by Pod directive.
 blk end para PARAGRAPH
 blk end pod PARAGRAPH
-doc end";
+blk beg pod PARAGRAPH version=>6
+blk beg para PARAGRAPH
+content Paragraph style second,
+content ended by blank line.
+blk end para PARAGRAPH
+blk end pod PARAGRAPH
+ambient say "more Perl 6";
+blk beg pod PARAGRAPH version=>6
+blk beg para PARAGRAPH
+content Paragraph style third,
+content ended by end of file.
+blk end para PARAGRAPH
+blk end pod PARAGRAPH
+doc end';
 eq_or_diff( $received, $expected, 'p01-para.pod paragraph style' );
 
 $received = Pod::Tree::Test.parsefile('t/p01-ambient.pod');

@@ -1,5 +1,9 @@
 # Pod/Tree/Test.pm  diagnotic emitter for Perl 6 tree based Pod parser
 
+# Before testing any other emitters, this diagnostic emitter ensures
+# that the Perldoc grammar in Pod::Tree::Parser can parse every test
+# document.
+
 use Pod::Tree::Parser;       # Perldoc grammar and Parser role
 
 class Pod::Tree::Test does Pod::Tree::Parser {
@@ -14,9 +18,10 @@ class Pod::Tree::Test does Pod::Tree::Parser {
         elsif defined($/<pod5>)    { make ~ $/<pod5>.ast; }
     }
     method ambient($/) {
-        my Str $ambient = ~ $0;
-        chomp $ambient;
-		make "ambient $ambient\n";
+#       my Str $ambient = ~ $0;
+#       chomp $ambient;
+#       make "ambient $ambient\n";
+        make [~] map( { "ambient $_\n" }, $/.comb(/\N+/) );
     }
     method pod6($/) {
         if    defined($/<p6delim>) { make ~ $/<p6delim>.ast; }
@@ -30,8 +35,8 @@ class Pod::Tree::Test does Pod::Tree::Parser {
     }
     method p6para($/) {
 #       warn "P6PARA in";
-        my Str $p6 = ~ $/<content>.ast;
-        make "blk beg pod PARAGRAPH version=>6\n$p6"
+        my Str $p6para = ~ $/<content>.ast;
+        make "blk beg pod PARAGRAPH version=>6\n$p6para"
            ~ "blk end pod PARAGRAPH\n";
 #       warn "P6PARA ok";
     }
@@ -41,10 +46,7 @@ class Pod::Tree::Test does Pod::Tree::Parser {
            ~ "blk end pod DELIMITED\n";
     }
     method content($/) {
-#       my @lines = $/.comb( /\N+/ );
-#       my @content = map( { "content " ~ $_ ~ "\n" }, @lines );
-        my $content = [~] map( { "content " ~ $_ ~ "\n" }, $/.comb(/\N+/) );
-#       make "blk beg para PARAGRAPH\n{@content}blk end para PARAGRAPH\n";
+        my $content = [~] map( { "content $_\n" }, $/.comb(/\N+/) );
         make "blk beg para PARAGRAPH\n{$content}blk end para PARAGRAPH\n";
     }
 }
