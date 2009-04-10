@@ -6,7 +6,7 @@ plan 1;
 
 my ( Str $received, Str $expected );
 
-$received = Pod::Tree::Xhtml.parsefile('t/p01-plain.pod');
+$received = Pod::Tree::Xhtml.parsefile('t/p01-delim.pod');
 $expected = q[<?xml version="1.0" ?>
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
 <html xmlns="http://www.w3.org/1999/xhtml">

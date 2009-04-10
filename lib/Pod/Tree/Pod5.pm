@@ -19,6 +19,11 @@ class Pod::Tree::Pod5 does Pod::Tree::Parser {
 		make "ambient $ambient\n";
     }
     method pod6($/) {
+        if    defined($/<p6delim>) { make ~ $/<p6delim>.ast; }
+        elsif defined($/<p6para>)  { make ~ $/<p6para>.ast; }
+        elsif defined($/<p6abbr>)  { make ~ $/<p6abbr>.ast; }
+    }
+    method p6delim($/) {
         my Str $p6 = ~ $/<content>.ast;
         make "=pod\n$p6=cut";
     }

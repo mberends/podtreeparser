@@ -6,7 +6,7 @@ plan 1;
 
 my ( Str $received, Str $expected );
 
-$received = Pod::Tree::Text.parsefile('t/p01-plain.pod');
+$received = Pod::Tree::Text.parsefile('t/p01-delim.pod');
 $expected = "    document 01 plain text";
 eq_or_diff( $received, $expected, 'p01-plain.pod simplest text' );
 

@@ -1,17 +1,26 @@
 # Pod/Tree/Parser.pm  base of the Perl 6 tree based Pod parser suite
 
-# :-) Perl 6 connects regular expressions to actions via a grammar
+# Specification: Perl6/Spec/S26-documentation.pod
+#       version: 2007-04-25 by Damian Conway
+
+# :-) Perl 6 connects regular expressions to actions via the grammar
 grammar Perldoc {
     regex TOP     { ^ <section> * $ {*} }
-    regex section { [ <ambient> | <pod6> | <pod5> ] {*} }
+    # This parser handles much of both Perl 5 and Perl 6 Pod
+    regex section { [ <ambient> | <pod5> | <pod6> ] {*} }
     regex ambient { ^^ ( <-[=]> .*? ) $$ \n? <?before [ ^^ '=' | $ ] > {*} }
-    regex pod6    { ^^ '=begin pod' \n <content> \n '=end pod' $$ \n? {*} }
-    regex p6block { .*? } # to be defined
+    # S26:62 the three block styles: delimited, paragraph, abbreviated
+    regex pod6    { [ <p6delim> | <p6para> ] {*} }
+    regex p6delim { ^^ '=begin pod' \n <content> \n '=end pod' $$ \n? {*} }
+    regex p6para  { ^^ '=for pod' \n <content> {*} }
+    # deviation from S26:207: instead of a Pod 6 abbreviated block,
+    # '=pod' provides backward compatibility with a subset of Pod 5.
     regex pod5    { ^^ '=pod' \n\n <content> \n '=cut' $$ \n? {*} }
+#   regex content { .*?     <?before [ \n? ^^ '=' | $ ] > {*} }
     regex content { .*?     <?before [ \n? ^^ '=' | $ ] > {*} }
 }
 
-# :-) 
+# :-) utility methods to mix in to an emitter class
 role Pod::Tree::Parser {
     # attributes, alphabetically
     has Bool     $!buf_out_enable = Bool::True; # for Z<> to suppress output

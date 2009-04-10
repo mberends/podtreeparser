@@ -7,7 +7,7 @@ plan 1;
 my ( Str $received, Str $expected );
 my $docdate = Pod::Tree::Man::docdate( time() ); # TODO: replace with mtime when stat() works
 
-$received = Pod::Tree::Man.parsefile('t/p01-plain.pod');
+$received = Pod::Tree::Man.parsefile('t/p01-delim.pod');
 $expected = qq[.TH test 6 "$docdate" "Perl 6" "Plain Old Documentation"] ~ q[
 .nh
 .ad l

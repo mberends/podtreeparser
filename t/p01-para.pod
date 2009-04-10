@@ -1,0 +1,2 @@
+=for pod
+Example of paragraph style, ended by blank line or end of file.

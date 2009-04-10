@@ -6,7 +6,7 @@ plan 1;
 
 my ( Str $received, Str $pod5, Str $pod6 );
 
-$pod6 = slurp('t/p01-plain.pod').chomp; # Rakudo slurp appends a "\n"
+$pod6 = slurp('t/p01-delim.pod').chomp; # Rakudo slurp appends a "\n"
 $pod5 = q[=pod
 
 document 01 plain text
