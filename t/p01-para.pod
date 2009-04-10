@@ -1,14 +1,14 @@
 #!perl6
-say "any Perl 6 code";
+say "Perl code";
 
 =for pod
 Paragraph style first,
 ended by Pod directive.
 =for pod
 Paragraph style second,
-ended by blank line.
+until blank line.
 
-say "more Perl 6";
+say "more Perl";
 =for pod
 Paragraph style third,
-ended by end of file.
+until end of file.

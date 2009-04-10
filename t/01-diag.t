@@ -1,6 +1,6 @@
 #!/usr/local/bin/perl6
 use Test::Differences;
-use Pod::Tree::Test; # diagnotic trace emitter for Perl 6 tree based Pod parser
+use Pod::Tree::Diag; # diagnotic trace emitter for Perl 6 tree based Pod parser
 
 plan 3;
 
@@ -19,7 +19,7 @@ eq_or_diff( $received, $expected, 'p01-delim.pod delimited style' );
 $received = Pod::Tree::Test.parsefile('t/p01-para.pod');
 $expected = 'doc beg test
 ambient #!perl6
-ambient say "any Perl 6 code";
+ambient say "Perl code";
 blk beg pod PARAGRAPH version=>6
 blk beg para PARAGRAPH
 content Paragraph style first,
@@ -29,14 +29,14 @@ blk end pod PARAGRAPH
 blk beg pod PARAGRAPH version=>6
 blk beg para PARAGRAPH
 content Paragraph style second,
-content ended by blank line.
+content until blank line.
 blk end para PARAGRAPH
 blk end pod PARAGRAPH
-ambient say "more Perl 6";
+ambient say "more Perl";
 blk beg pod PARAGRAPH version=>6
 blk beg para PARAGRAPH
 content Paragraph style third,
-content ended by end of file.
+content until end of file.
 blk end para PARAGRAPH
 blk end pod PARAGRAPH
 doc end';

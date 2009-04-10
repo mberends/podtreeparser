@@ -5,7 +5,7 @@
 # git clone git://github.com/mberends/podtreeparser.git
 # cd podtreeparser && perl6 Configure.p6 && make test
 
-# Chat with the author and P6 developers in #perl6 on irc.freenode.net.
+# Chat with the author and P6 developers in #perl6 at irc.freenode.net.
 
 # Bugs:
 # These Pod tools may give errors running with certain revisions of
@@ -15,20 +15,18 @@
 # Configure.p6 replaces <TOKENS> when converting Makefile.in -> Makefile
 PERL6      = <PERL6>
 RAKUDO_DIR = <RAKUDO_DIR>
-# The variables PERL6LIB and PERL6BIN are not required in this Makefile.
+# Variables PERL6LIB and PERL6BIN not used in this Makefile.
 
-all: precompile
-
-precompile: lib/Pod/Tree/Parser.pir lib/Pod/Tree/Test.pir \
- lib/Pod/Tree/Text.pir lib/Pod/Tree/Man.pir lib/Pod/Tree/Xhtml.pir \
- lib/Pod/Tree/Pod5.pir lib/Pod/Tree/Pod6.pir \
- lib/Test.pir lib/Test/Harness.pir lib/Test/Differences.pir
-
-# define how to precompile a module from its source code
+# make-fu from http://www.gnu.org/software/make/manual/make.html
+SOURCES=$(wildcard lib/Pod/Tree/*.pm) $(wildcard lib/Test/*.pm)
+PIRS=lib/Test.pir $(SOURCES:.pm=.pir)
+# define how to precompile a module from its source
 .SUFFIXES: .pm .pir
 .pm.pir: $(PERL6) Makefile
 	@echo 'precompile $< -> $@'
 	@export PERL6LIB=./lib; $(PERL6) --target=pir --output=$@ $<
+
+all: $(PIRS)
 
 # avoid duplication - precompile the Test module from the Parrot source
 lib/Test.pir: $(RAKUDO_DIR)/Test.pm $(PERL6) Makefile

@@ -18,27 +18,26 @@ class Pod::Tree::Test does Pod::Tree::Parser {
         elsif defined($/<pod5>)    { make ~ $/<pod5>.ast; }
     }
     method ambient($/) {
-#       my Str $ambient = ~ $0;
-#       chomp $ambient;
-#       make "ambient $ambient\n";
         make [~] map( { "ambient $_\n" }, $/.comb(/\N+/) );
     }
     method pod6($/) {
-        if    defined($/<p6delim>) { make ~ $/<p6delim>.ast; }
-        elsif defined($/<p6para>)  { make ~ $/<p6para>.ast; }
-        elsif defined($/<p6abbr>)  { make ~ $/<p6abbr>.ast; }
+        if    defined($/<p6delim>) { make [~]map({$_.ast},@($/<p6delim>));}
+        elsif defined($/<p6para>)  { make [~]map({$_.ast},@($/<p6para>));}
+        elsif defined($/<p6abbr>)  { make [~]map({$_.ast},@($/<p6abbr>));}
     }
     method p6delim($/) {
-        my Str $p6 = ~ $/<content>.ast;
-        make "blk beg pod DELIMITED version=>6\n$p6"
-           ~ "blk end pod DELIMITED\n";
+        my Str $typename = ~ $0<typename>;
+        my Str $delimited;
+        if defined($/<content>) { $delimited = ~ $/<content>.ast; }
+        elsif defined($/<pod6>) { $delimited = ~ $/<pod6>.ast; }
+        make "blk beg $typename DELIMITED version=>6\n$delimited"
+           ~ "blk end $typename DELIMITED\n";
     }
     method p6para($/) {
-#       warn "P6PARA in";
+        my Str $typename = ~ $/<typename>;
         my Str $p6para = ~ $/<content>.ast;
-        make "blk beg pod PARAGRAPH version=>6\n$p6para"
-           ~ "blk end pod PARAGRAPH\n";
-#       warn "P6PARA ok";
+        make "blk beg $typename PARAGRAPH version=>6\n$p6para"
+           ~ "blk end $typename PARAGRAPH\n";
     }
     method pod5($/) {
         my Str $p5 = ~ $/<content>.ast;

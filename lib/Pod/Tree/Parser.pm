@@ -3,24 +3,30 @@
 # Specification: Perl6/Spec/S26-documentation.pod
 #       version: 2007-04-25 by Damian Conway
 
-# :-) Perl 6 connects regular expressions to actions via the grammar
+# Perl 6 connects regular expressions to actions via the grammar
 grammar Perldoc {
     regex TOP     { ^ <section> * $ {*} }
-    # Deviate from S26 by matching much of both Perl 5 and Perl 6 Pod
+    # Deviate from S26 by matching some Perl 5 Pod as well as Perl 6 Pod
     regex section { [ <ambient> | <pod5> | <pod6> ] {*} }
     regex ambient { ^^ ( <-[=]> .*? ) $$ \n? <?before [ ^^ '=' | $ ] > {*} }
     # S26:62 three block styles: delimited, paragraph, abbreviated
     # This does only two so far.
-    regex pod6    { [ <p6delim> | <p6para> ] {*} }
-    regex p6delim { ^^ '=begin pod' \n <content> \n '=end pod' $$ \n? {*} }
-    regex p6para  { ^^ '=for pod' \n <content> {*} }
+    regex pod6    { [ <p6delim> | <p6para> ]+ {*} }
+    regex p6delim { ^^'=begin ' ( <typename> ) \n
+                      <content> \n
+                      '=end ' $0 $$
+                      \n?
+                      {*}
+                  }
+    regex p6para  { ^^ '=for ' <typename> \n <content> {*} }
+    regex typename{ code | head\d | para | pod | table }
     # Deviate from S26:207: instead of a Pod 6 abbreviated block,
-    # '=pod' matches a subset of Pod 5.
+    # '=pod' can match a subset of Pod 5.
     regex pod5    { ^^ '=pod' \n\n <content> \n '=cut' $$ \n? {*} }
     regex content {
-        .*?              # all of Pod 6 TODO
-        <?before [       # lookahead prevents unnecessary backtracking
-            ^^ \n |      # blank line ends paragraph style block
+        .*?              # all of Pod 6 TODO :-)
+        <?before [       # lookahead avoids unnecessary backtracking
+            ^^$$       | # blank line ends paragraph style block
             \n? ^^ '=' | # directive ends delimited style block
             $            # end of file ends anything
         ] >
@@ -28,7 +34,7 @@ grammar Perldoc {
     }
 }
 
-# :-) utility methods to mix in to an emitter class
+# methods useful to an emitter class
 role Pod::Tree::Parser {
     # attributes, alphabetically
     has Bool     $!buf_out_enable = Bool::True; # for Z<> to suppress output

@@ -21,9 +21,9 @@ class Pod::Tree::Man does Pod::Tree::Parser {
 		make "ambient $ambient\n";
     }
     method pod6($/) {
-        if    defined($/<p6delim>) { make ~ $/<p6delim>.ast; }
-        elsif defined($/<p6para>)  { make ~ $/<p6para>.ast; }
-        elsif defined($/<p6abbr>)  { make ~ $/<p6abbr>.ast; }
+        if    defined($/<p6delim>) { make ~ $/<p6delim>[0].ast; }
+        elsif defined($/<p6para>)  { make ~ $/<p6para>[0].ast; }
+        elsif defined($/<p6abbr>)  { make ~ $/<p6abbr>[0].ast; }
     }
     method p6delim($/) {
         my Str $p6 = ~ $/<content>.ast;
